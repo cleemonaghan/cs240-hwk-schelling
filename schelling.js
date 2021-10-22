@@ -44,6 +44,12 @@ function init() {
 		randomizeBoard();
 		displayBoard();
 	});
+	//get the % vacant cells from the inputs
+	let randomizeButton = document.querySelector("#randomize");
+	randomizeButton.addEventListener("click", () => {
+		randomizeBoard();
+		displayBoard();
+	});
 
 	// ----- generate the board ----
 	//get the inputed size of the board
