@@ -22,14 +22,12 @@ function init() {
 	});
 	//get color1 from the inputs
 	let color1 = document.querySelector("#popXcolor");
-	color1.addEventListener("change", () => {
-		updateBoardColors();
+	color1.addEventListener("input", () => {
 		displayBoard();
 	});
 	//get color2 from the inputs
 	let color2 = document.querySelector("#popYcolor");
-	color2.addEventListener("change", () => {
-		updateBoardColors();
+	color2.addEventListener("input", () => {
 		displayBoard();
 	});
 	//get the % population split from the inputs
@@ -67,8 +65,6 @@ function init() {
 	displayBoard();
 }
 
-function updateBoardColors() {}
-
 function randomizeBoard() {
 	//get the inputed size of the board
 	let dimension = document.querySelector("#dimension").value;
@@ -104,13 +100,13 @@ function randomizeBoard() {
 			let color;
 			if (rand < probOfColor1 && color1available > 0) {
 				//the tile is color 1
-				color = color1;
+				color = "color1";
 			} else if (rand < probOfColor1 + probOfColor2 && color2available > 0) {
 				//the tile is color 2
-				color = color2;
+				color = "color2";
 			} else {
 				//the tile is empty
-				color = "rgb(255, 255, 255)";
+				color = "empty";
 			}
 			boardArray[i][j] = color;
 		}
@@ -129,7 +125,18 @@ function displayBoard() {
 		for (let j = 0; j < boardArray.length; j++) {
 			//create the tile element
 			let tile = document.createElement("td");
-			tile.style = `background-color:${boardArray[i][j]}`;
+			//determine the color
+			if (boardArray[i][j] == "empty")
+				tile.style = `background-color:rgb(255,255,255)`;
+			else if (boardArray[i][j] == "color1")
+				tile.style = `background-color:${
+					document.querySelector("#popXcolor").value
+				}`;
+			else if (boardArray[i][j] == "color2")
+				tile.style = `background-color:${
+					document.querySelector("#popYcolor").value
+				}`;
+
 			// add the tile element to the row
 			row.appendChild(tile);
 		}
