@@ -14,6 +14,22 @@ init();
 function init() {
 	//get the inputed size of the board
 	let dimension = document.querySelector("#dimension").value;
+
+	//initalize the board
+	boardArray = new Array(dimension);
+	for (let i = 0; i < dimension; i++) {
+		boardArray[i] = new Array(dimension);
+	}
+
+	//randomize the tiles of the board
+	randomizeBoard();
+	//display the board
+	generateBoard();
+}
+
+function randomizeBoard() {
+	//get the inputed size of the board
+	let dimension = document.querySelector("#dimension").value;
 	//get color1 from the inputs
 	let color1 = document.querySelector("#popXcolor").value;
 	//get color2 from the inputs
@@ -23,8 +39,7 @@ function init() {
 	//get the % vacant cells from the inputs
 	let vacantRatio = document.querySelector("#vacantRatio").value;
 
-	//generate the board
-	boardArray = new Array(dimension);
+	//create variables for probability and availablity for each color
 	let probOfColor1 = (1 - vacantRatio) * popRatio;
 	let probOfColor2 = (1 - vacantRatio) * (1 - popRatio);
 	let color1available = probOfColor1 * dimension * dimension;
@@ -32,7 +47,6 @@ function init() {
 
 	//for each tile on the board, assign it a random color
 	for (let i = 0; i < dimension; i++) {
-		boardArray[i] = new Array(dimension);
 		for (let j = 0; j < dimension; j++) {
 			//assign the index a color
 			let rand = Math.random();
@@ -50,9 +64,6 @@ function init() {
 			boardArray[i][j] = color;
 		}
 	}
-
-	//generate the board
-	generateBoard(dimension, color1, color2, popRatio, vacantRatio);
 }
 
 function generateBoard() {
