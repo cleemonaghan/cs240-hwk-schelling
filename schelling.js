@@ -55,18 +55,16 @@ function init() {
 	generateBoard(dimension, color1, color2, popRatio, vacantRatio);
 }
 
-function generateBoard(dimension, color1, color2, popRatio, vacantRatio) {
-	//fix
-
+function generateBoard() {
 	// create a new table element
 	const newTable = document.createElement("table");
 
 	//add each row to the board
-	for (let i = 0; i < dimension; i++) {
+	for (let i = 0; i < boardArray.length; i++) {
 		//create the row element
 		let row = document.createElement("tr");
 		//add each tile in the row
-		for (let j = 0; j < dimension; j++) {
+		for (let j = 0; j < boardArray.length; j++) {
 			//create the tile element
 			let tile = document.createElement("td");
 			tile.style = `background-color:${boardArray[i][j]}`;
