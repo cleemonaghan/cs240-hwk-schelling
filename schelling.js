@@ -24,7 +24,7 @@ function init() {
 	//randomize the tiles of the board
 	randomizeBoard();
 	//display the board
-	generateBoard();
+	displayBoard();
 }
 
 function randomizeBoard() {
@@ -66,7 +66,7 @@ function randomizeBoard() {
 	}
 }
 
-function generateBoard() {
+function displayBoard() {
 	// create a new table element
 	const newTable = document.createElement("table");
 
