@@ -70,8 +70,6 @@ function init() {
 function updateBoardColors() {}
 
 function randomizeBoard() {
-	//Fix!!!  needs to generate array with larger or smaller dimension
-
 	//get the inputed size of the board
 	let dimension = document.querySelector("#dimension").value;
 	//get color1 from the inputs
@@ -82,6 +80,15 @@ function randomizeBoard() {
 	let popRatio = document.querySelector("#popRatio").value;
 	//get the % vacant cells from the inputs
 	let vacantRatio = document.querySelector("#vacantRatio").value;
+
+	//check if we need to reallocate space in boardArray
+	if (dimension != boardArray.length) {
+		//reallocate space for boardArray
+		boardArray = new Array(dimension);
+		for (let i = 0; i < dimension; i++) {
+			boardArray[i] = new Array(dimension);
+		}
+	}
 
 	//create variables for probability and availablity for each color
 	let probOfColor1 = (1 - vacantRatio) * popRatio;
