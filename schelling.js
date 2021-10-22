@@ -9,16 +9,50 @@ var boardArray;
 init();
 
 /**
- * This method gathers the inputs and generates the board
+ * This method adds event listeners to the html inputs and generates the board
  */
 function init() {
+	// ----- add event listeners ----
+	//size of the board
+	let dimension = document.querySelector("#dimension");
+	dimension.addEventListener("change", () => {
+		console.log("yes");
+		randomizeBoard();
+		displayBoard();
+	});
+	//get color1 from the inputs
+	let color1 = document.querySelector("#popXcolor");
+	color1.addEventListener("change", () => {
+		updateBoardColors();
+		displayBoard();
+	});
+	//get color2 from the inputs
+	let color2 = document.querySelector("#popYcolor");
+	color2.addEventListener("change", () => {
+		updateBoardColors();
+		displayBoard();
+	});
+	//get the % population split from the inputs
+	let popRatio = document.querySelector("#popRatio");
+	popRatio.addEventListener("change", () => {
+		randomizeBoard();
+		displayBoard();
+	});
+	//get the % vacant cells from the inputs
+	let vacantRatio = document.querySelector("#vacantRatio");
+	vacantRatio.addEventListener("change", () => {
+		randomizeBoard();
+		displayBoard();
+	});
+
+	// ----- generate the board ----
 	//get the inputed size of the board
-	let dimension = document.querySelector("#dimension").value;
+	let dim = dimension.value;
 
 	//initalize the board
-	boardArray = new Array(dimension);
-	for (let i = 0; i < dimension; i++) {
-		boardArray[i] = new Array(dimension);
+	boardArray = new Array(dim);
+	for (let i = 0; i < dim; i++) {
+		boardArray[i] = new Array(dim);
 	}
 
 	//randomize the tiles of the board
@@ -27,7 +61,11 @@ function init() {
 	displayBoard();
 }
 
+function updateBoardColors() {}
+
 function randomizeBoard() {
+	//Fix!!!  needs to generate array with larger or smaller dimension
+
 	//get the inputed size of the board
 	let dimension = document.querySelector("#dimension").value;
 	//get color1 from the inputs
