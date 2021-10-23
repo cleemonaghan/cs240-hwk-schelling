@@ -22,6 +22,12 @@ function init() {
 		randomizeBoard();
 		displayBoard();
 	});
+	dimension.addEventListener("input", () => {
+		//update display for slider
+		let dimensionDisplay = document.querySelector("#dimensionDisplay");
+		dimensionDisplay.innerHTML = dimension.value;
+	});
+
 	//get color1 from the inputs
 	let color1 = document.querySelector("#popXcolor");
 	color1.addEventListener("input", () => {
@@ -38,6 +44,20 @@ function init() {
 		randomizeBoard();
 		displayBoard();
 	});
+	popRatio.addEventListener("input", () => {
+		//update display for slider
+		let popRatioDisplay = document.querySelector("#popRatioDisplay");
+		popRatioDisplay.innerHTML = popRatio.value;
+	});
+
+	//get the % population split from the inputs
+	let threshold = document.querySelector("#threshold");
+	threshold.addEventListener("input", () => {
+		//update display for slider
+		let thresholdDisplay = document.querySelector("#thresholdDisplay");
+		thresholdDisplay.innerHTML = threshold.value;
+	});
+
 	//get the % vacant cells from the inputs
 	let vacantRatio = document.querySelector("#vacantRatio");
 	vacantRatio.addEventListener("change", () => {
