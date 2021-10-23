@@ -204,85 +204,83 @@ async function Simulate() {
 
 	//begin the loop
 	while (document.querySelector("#runstop").value == "false") {
-		//for (let i = 0; i < 10; i++) {
 		try {
-			let result = await round();
+			let dimension = document.querySelector("#dimension").value;
+			let result = await round(dimension);
 			displayBoard();
-		} catch (error) {
-			console.log(error);
-		}
+		} catch (error) {}
 	}
 }
 
-function round() {
-	return new Promise((resolve) => {
+function round(dim) {
+	return new Promise((resolve, reject) => {
 		setTimeout(() => {
-			//dimension of the board
-			let dim = document.querySelector("#dimension").value;
-			//list of empty tiles on the board
-			const emptyTiles = new Array();
-			//list of tiles to relocate to empty tiles
-			const tilesToMove = new Array();
-			//a boolean describing whether the board has converged to a stable state
-			let converged = false;
+			try {
+				//list of empty tiles on the board
+				const emptyTiles = new Array();
+				//list of tiles to relocate to empty tiles
+				const tilesToMove = new Array();
+				//a boolean describing whether the board has converged to a stable state
+				let converged = false;
 
-			//iterate through every element
-			for (let i = 0; i < dim; i++) {
-				for (let j = 0; j < dim; j++) {
-					//--- identify empty tiles -----
-					if (boardArray[i][j] == "empty") {
-						//add tile coordinates to the emptyTiles list
-						emptyTiles.push([i, j]);
-					} else {
-						//count the number of neighbors at the given i,j coordinate
-						//and add it to tilesToMove if it needs to be relocated
-						countNeighbors(tilesToMove, i, j);
+				//iterate through every element
+				for (let i = 0; i < dim; i++) {
+					for (let j = 0; j < dim; j++) {
+						//--- identify empty tiles -----
+						if (boardArray[i][j] == "empty") {
+							//add tile coordinates to the emptyTiles list
+							emptyTiles.push([i, j]);
+						} else {
+							//count the number of neighbors at the given i,j coordinate
+							//and add it to tilesToMove if it needs to be relocated
+							countNeighbors(tilesToMove, i, j, dim);
+						}
 					}
 				}
-			}
 
-			if (tilesToMove.length == 0) converged = true;
+				if (tilesToMove.length == 0) converged = true;
 
-			//for each tile in the list of tiles to be moved
-			while (tilesToMove.length > 0) {
-				//select a tile to relocate
-				let rand = Math.floor(Math.random() * tilesToMove.length);
-				let moving = tilesToMove.splice(rand, 1)[0];
-				let x = moving[0];
-				let y = moving[1];
-				//select a home for the tile to move to
-				rand = Math.floor(Math.random() * emptyTiles.length);
-				let newHome = emptyTiles.splice(rand, 1)[0];
-				//swap the tile with an empty tile
-				boardArray[newHome[0]][newHome[1]] = boardArray[x][y];
-				boardArray[x][y] = "empty";
-				//add the new empty tile to the empty tile list
-				emptyTiles.push([x, y]);
-			}
+				//for each tile in the list of tiles to be moved
+				while (tilesToMove.length > 0) {
+					//select a tile to relocate
+					let moving = tilesToMove.pop();
+					let x = moving[0];
+					let y = moving[1];
+					//select a home for the tile to move to
+					rand = Math.floor(Math.random() * emptyTiles.length);
+					let newHome = emptyTiles.splice(rand, 1)[0];
+					//swap the tile with an empty tile
+					boardArray[newHome[0]][newHome[1]] = boardArray[x][y];
+					boardArray[x][y] = "empty";
+					//add the new empty tile to the empty tile list
+					emptyTiles.push([x, y]);
+				}
 
-			//increment the number of generations
-			generations++;
-			let gen = document.querySelector("p");
-			gen.innerHTML = `Generations: ${generations}`;
-			//examine whether any moves were made
-			//if no moves were made, set runstop to true to stop the loop
-			if (converged == true) {
-				//we are stopped
-				let runstop = document.querySelector("#runstop");
-				//if false, change runstop to true
-				runstop.value = "true";
-				//change button to display run
-				runstop.innerHTML = "Run";
+				//increment the number of generations
+				generations++;
+				let gen = document.querySelector("p");
+				gen.innerHTML = `Generations: ${generations}`;
+				//examine whether any moves were made
+				//if no moves were made, set runstop to true to stop the loop
+				if (converged == true) {
+					//we are stopped
+					let runstop = document.querySelector("#runstop");
+					//if false, change runstop to true
+					runstop.value = "true";
+					//change button to display run
+					runstop.innerHTML = "Run";
+				}
+				resolve("success");
+			} catch (err) {
+				reject(err);
 			}
-			resolve("success");
 		}, 100);
 	});
 }
 
-function countNeighbors(tilesToMove, i, j) {
+function countNeighbors(tilesToMove, i, j, dim) {
 	//count the number of neighbors and homogeneous neighbors at the given i,j coordinate
 
-	let dim = document.querySelector("#dimension").value;
 	let threshold = document.querySelector("#threshold").value;
 	let neighbors = 0;
 	let sameColoredNeighbors = 0;
