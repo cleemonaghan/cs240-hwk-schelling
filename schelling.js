@@ -113,8 +113,8 @@ function randomizeBoard() {
 	//create variables for probability and availablity for each color
 	let probOfColor1 = (1 - vacantRatio) * popRatio;
 	let probOfColor2 = (1 - vacantRatio) * (1 - popRatio);
-	let color1available = probOfColor1 * dimension * dimension;
-	let color2available = probOfColor2 * dimension * dimension;
+	let color1available = Math.floor(probOfColor1 * dimension * dimension);
+	let color2available = Math.floor(probOfColor2 * dimension * dimension);
 
 	//for each tile on the board, assign it a random color
 	for (let i = 0; i < dimension; i++) {
@@ -125,9 +125,11 @@ function randomizeBoard() {
 			if (rand < probOfColor1 && color1available > 0) {
 				//the tile is color 1
 				color = "color1";
+				color1available--;
 			} else if (rand < probOfColor1 + probOfColor2 && color2available > 0) {
 				//the tile is color 2
 				color = "color2";
+				color2available--;
 			} else {
 				//the tile is empty
 				color = "empty";
@@ -253,7 +255,7 @@ function round() {
 				runstop.innerHTML = "Run";
 			}
 			resolve("success");
-		}, 0);
+		}, 100);
 	});
 }
 
