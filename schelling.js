@@ -197,7 +197,6 @@ function round() {
 		setTimeout(() => {
 			//dimension of the board
 			let dim = document.querySelector("#dimension").value;
-			let threshold = document.querySelector("#threshold").value;
 			//list of empty tiles on the board
 			const emptyTiles = new Array();
 			//list of tiles to relocate to empty tiles
@@ -213,66 +212,9 @@ function round() {
 						//add tile coordinates to the emptyTiles list
 						emptyTiles.push([i, j]);
 					} else {
-						//--- count neighbors phase ----
-						//count the number of neighbors and homogeneous neighbors
-						let neighbors = 0;
-						let sameColoredNeighbors = 0;
-
-						if (i != 0) {
-							//if we are not in the top row, count the neighbors above us
-							let x = boardArray[i - 1][j];
-							if (x != "empty") neighbors++;
-							if (x == boardArray[i][j]) sameColoredNeighbors++;
-							//check the neighbor up-left
-							if (j != 0) {
-								x = boardArray[i - 1][j - 1];
-								if (x != "empty") neighbors++;
-								if (x == boardArray[i][j]) sameColoredNeighbors++;
-							}
-							//check the neighbor up-right
-							if (j != dim - 1) {
-								x = boardArray[i - 1][j + 1];
-								if (x != "empty") neighbors++;
-								if (x == boardArray[i][j]) sameColoredNeighbors++;
-							}
-						}
-						if (i != dim - 1) {
-							//if we are not in the bottom row, count the neighbors below us
-							let x = boardArray[i + 1][j];
-							if (x != "empty") neighbors++;
-							if (x == boardArray[i][j]) sameColoredNeighbors++;
-							//check the neighbor up-left
-							if (j != 0) {
-								x = boardArray[i + 1][j - 1];
-								if (x != "empty") neighbors++;
-								if (x == boardArray[i][j]) sameColoredNeighbors++;
-							}
-							//check the neighbor up-right
-							if (j != dim - 1) {
-								x = boardArray[i + 1][j + 1];
-								if (x != "empty") neighbors++;
-								if (x == boardArray[i][j]) sameColoredNeighbors++;
-							}
-						}
-						//check the neighbor left
-						if (j != 0) {
-							x = boardArray[i][j - 1];
-							if (x != "empty") neighbors++;
-							if (x == boardArray[i][j]) sameColoredNeighbors++;
-						}
-						//check the neighbor right
-						if (j != dim - 1) {
-							x = boardArray[i][j + 1];
-							if (x != "empty") neighbors++;
-							if (x == boardArray[i][j]) sameColoredNeighbors++;
-						}
-
-						//determine whether it moves to a random vacant location
-						//check the sameColoredNeighbors/neighbors against the threshold
-						if (sameColoredNeighbors / neighbors < threshold) {
-							//add the tile to the list of tiles to be moved
-							tilesToMove.push([i, j]);
-						}
+						//count the number of neighbors at the given i,j coordinate
+						//and add it to tilesToMove if it needs to be relocated
+						countNeighbors(tilesToMove, i, j);
 					}
 				}
 			}
@@ -313,4 +255,69 @@ function round() {
 			resolve("success");
 		}, 0);
 	});
+}
+
+function countNeighbors(tilesToMove, i, j) {
+	//count the number of neighbors and homogeneous neighbors at the given i,j coordinate
+
+	let dim = document.querySelector("#dimension").value;
+	let threshold = document.querySelector("#threshold").value;
+	let neighbors = 0;
+	let sameColoredNeighbors = 0;
+
+	if (i != 0) {
+		//if we are not in the top row, count the neighbors above us
+		let x = boardArray[i - 1][j];
+		if (x != "empty") neighbors++;
+		if (x == boardArray[i][j]) sameColoredNeighbors++;
+		//check the neighbor up-left
+		if (j != 0) {
+			x = boardArray[i - 1][j - 1];
+			if (x != "empty") neighbors++;
+			if (x == boardArray[i][j]) sameColoredNeighbors++;
+		}
+		//check the neighbor up-right
+		if (j != dim - 1) {
+			x = boardArray[i - 1][j + 1];
+			if (x != "empty") neighbors++;
+			if (x == boardArray[i][j]) sameColoredNeighbors++;
+		}
+	}
+	if (i != dim - 1) {
+		//if we are not in the bottom row, count the neighbors below us
+		let x = boardArray[i + 1][j];
+		if (x != "empty") neighbors++;
+		if (x == boardArray[i][j]) sameColoredNeighbors++;
+		//check the neighbor up-left
+		if (j != 0) {
+			x = boardArray[i + 1][j - 1];
+			if (x != "empty") neighbors++;
+			if (x == boardArray[i][j]) sameColoredNeighbors++;
+		}
+		//check the neighbor up-right
+		if (j != dim - 1) {
+			x = boardArray[i + 1][j + 1];
+			if (x != "empty") neighbors++;
+			if (x == boardArray[i][j]) sameColoredNeighbors++;
+		}
+	}
+	//check the neighbor left
+	if (j != 0) {
+		x = boardArray[i][j - 1];
+		if (x != "empty") neighbors++;
+		if (x == boardArray[i][j]) sameColoredNeighbors++;
+	}
+	//check the neighbor right
+	if (j != dim - 1) {
+		x = boardArray[i][j + 1];
+		if (x != "empty") neighbors++;
+		if (x == boardArray[i][j]) sameColoredNeighbors++;
+	}
+
+	//determine whether it moves to a random vacant location
+	//check the sameColoredNeighbors/neighbors against the threshold
+	if (sameColoredNeighbors / neighbors < threshold) {
+		//add the tile to the list of tiles to be moved
+		tilesToMove.push([i, j]);
+	}
 }
