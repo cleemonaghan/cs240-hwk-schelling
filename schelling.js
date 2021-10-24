@@ -3,20 +3,20 @@
  * @author Colin Monaghan
  */
 
+//the global variable containing the values of the board
 var boardArray;
-var generations;
 
 //initialize the board
 init();
-//simulate the board
-Simulate();
 
 /**
- * This method adds event listeners to the html inputs and generates the board
+ * This method adds event listeners to the html inputs
+ * and runs the functions to generate the board
  */
 function init() {
 	// ----- add event listeners ----
-	//size of the board
+
+	//Add event listeners to the dimension slider
 	let dimension = document.querySelector("#dimension");
 	dimension.addEventListener("change", () => {
 		randomizeBoard();
@@ -28,17 +28,22 @@ function init() {
 		dimensionDisplay.innerHTML = dimension.value;
 	});
 
-	//get color1 from the inputs
-	let color1 = document.querySelector("#popXcolor");
-	color1.addEventListener("input", () => {
+	//Add event listeners to the similarity threshold slider
+	let threshold = document.querySelector("#threshold");
+	threshold.addEventListener("input", () => {
+		//update display for slider
+		let thresholdDisplay = document.querySelector("#thresholdDisplay");
+		thresholdDisplay.innerHTML = threshold.value;
+	});
+
+	//Add event listeners to the % vacant cells input box
+	let vacantRatio = document.querySelector("#vacantRatio");
+	vacantRatio.addEventListener("input", () => {
+		randomizeBoard();
 		displayBoard();
 	});
-	//get color2 from the inputs
-	let color2 = document.querySelector("#popYcolor");
-	color2.addEventListener("input", () => {
-		displayBoard();
-	});
-	//get the % population split from the inputs
+
+	//Add event listeners to the % Population split slider
 	let popRatio = document.querySelector("#popRatio");
 	popRatio.addEventListener("change", () => {
 		randomizeBoard();
@@ -50,27 +55,26 @@ function init() {
 		popRatioDisplay.innerHTML = popRatio.value;
 	});
 
-	//get the % population split from the inputs
-	let threshold = document.querySelector("#threshold");
-	threshold.addEventListener("input", () => {
-		//update display for slider
-		let thresholdDisplay = document.querySelector("#thresholdDisplay");
-		thresholdDisplay.innerHTML = threshold.value;
-	});
-
-	//get the % vacant cells from the inputs
-	let vacantRatio = document.querySelector("#vacantRatio");
-	vacantRatio.addEventListener("change", () => {
-		randomizeBoard();
+	//Add event listeners to the Population 1 color picker
+	let color1 = document.querySelector("#popXcolor");
+	color1.addEventListener("input", () => {
 		displayBoard();
 	});
-	//get the % vacant cells from the inputs
+
+	//Add event listeners to the Population 2 color picker
+	let color2 = document.querySelector("#popYcolor");
+	color2.addEventListener("input", () => {
+		displayBoard();
+	});
+
+	//Add event listeners to the randomize button
 	let randomizeButton = document.querySelector("#randomize");
 	randomizeButton.addEventListener("click", () => {
 		randomizeBoard();
 		displayBoard();
 	});
-	//
+
+	//Add event listeners to the run/stop button
 	let runstop = document.querySelector("#runstop");
 	runstop.addEventListener("click", () => {
 		if (runstop.value == "true") {
@@ -107,15 +111,18 @@ function init() {
 	randomizeBoard();
 	//display the board
 	displayBoard();
+	//simulate the board
+	Simulate();
 }
 
+/**
+ * This method randomly assigns values to the tiles on the board
+ * according to the dimension, population ratio, and vacancy ratio
+ * inputed.
+ */
 function randomizeBoard() {
 	//get the inputed size of the board
 	let dimension = document.querySelector("#dimension").value;
-	//get color1 from the inputs
-	let color1 = document.querySelector("#popXcolor").value;
-	//get color2 from the inputs
-	let color2 = document.querySelector("#popYcolor").value;
 	//get the % population split from the inputs
 	let popRatio = document.querySelector("#popRatio").value;
 	//get the % vacant cells from the inputs
@@ -159,6 +166,13 @@ function randomizeBoard() {
 	}
 }
 
+/**
+ * This function manipulates the index.html DOM to
+ * display the contents of the board to the screen.
+ *
+ * The board is "printed" as a table element with
+ * each tile as a td element of the table.
+ */
 function displayBoard() {
 	// create a new table element
 	const newTable = document.createElement("table");
@@ -182,11 +196,9 @@ function displayBoard() {
 				tile.style = `background-color:${
 					document.querySelector("#popYcolor").value
 				}`;
-
 			// add the tile element to the row
 			row.appendChild(tile);
 		}
-
 		// add the row element to the table
 		newTable.appendChild(row);
 	}
@@ -196,51 +208,74 @@ function displayBoard() {
 	parent.replaceChildren(newTable);
 }
 
+/**
+ * This function asynchronously runs the simulation until
+ * the board converges to a stable state.
+ */
 async function Simulate() {
 	//reset generations to zero
-	generations = 0;
+	var generations = 0;
 	let gen = document.querySelector("p");
 	gen.innerHTML = `Generations: ${generations}`;
 
 	//begin the loop
 	while (document.querySelector("#runstop").value == "false") {
-		try {
-			let dimension = document.querySelector("#dimension").value;
-			let result = await round(dimension);
-			displayBoard();
-		} catch (error) {}
+		//retrieve the dimension of the board at the current moment
+		let dimension = document.querySelector("#dimension").value;
+		//asynchronously play a round
+		await round(dimension);
+		//display the baord
+		displayBoard();
 	}
 }
 
+/**
+ * This function creates and returns a promise that simulates a generation.
+ * The promise interates through every tile of boardArray, identifying empty
+ * tiles and tiles that need to be relocated. Then it swaps every tile that
+ * needs to be relocated with an empty tile, increments the generations variable,
+ * and determines if the board has converged before it returns.
+ *
+ * @param {integer} dim the length of the board
+ * @returns a promise that simulates a generation
+ */
 function round(dim) {
 	return new Promise((resolve, reject) => {
+		//set a 1 second delay between generations
 		setTimeout(() => {
 			try {
 				//list of empty tiles on the board
 				const emptyTiles = new Array();
 				//list of tiles to relocate to empty tiles
 				const tilesToMove = new Array();
-				//a boolean describing whether the board has converged to a stable state
-				let converged = false;
 
 				//iterate through every element
 				for (let i = 0; i < dim; i++) {
 					for (let j = 0; j < dim; j++) {
-						//--- identify empty tiles -----
+						//identify empty tiles
 						if (boardArray[i][j] == "empty") {
 							//add tile coordinates to the emptyTiles list
 							emptyTiles.push([i, j]);
 						} else {
-							//count the number of neighbors at the given i,j coordinate
+							//count the number of neighbors at the given (i,j) coordinate
 							//and add it to tilesToMove if it needs to be relocated
 							countNeighbors(tilesToMove, i, j, dim);
 						}
 					}
 				}
 
-				if (tilesToMove.length == 0) converged = true;
+				//if there are no tiles to move, we have converged
+				//so set runstop to true to stop the loop
+				if (tilesToMove.length == 0) {
+					//we are stopped
+					let runstop = document.querySelector("#runstop");
+					//if false, change runstop to true
+					runstop.value = "true";
+					//change button to display run
+					runstop.innerHTML = "Run";
+				}
 
-				//for each tile in the list of tiles to be moved
+				//relocate each tile in the list of tiles to be moved
 				while (tilesToMove.length > 0) {
 					//select a tile to relocate
 					let moving = tilesToMove.pop();
@@ -260,31 +295,37 @@ function round(dim) {
 				generations++;
 				let gen = document.querySelector("p");
 				gen.innerHTML = `Generations: ${generations}`;
-				//examine whether any moves were made
-				//if no moves were made, set runstop to true to stop the loop
-				if (converged == true) {
-					//we are stopped
-					let runstop = document.querySelector("#runstop");
-					//if false, change runstop to true
-					runstop.value = "true";
-					//change button to display run
-					runstop.innerHTML = "Run";
-				}
+
+				//resolve the promise
 				resolve("success");
 			} catch (err) {
+				//if there was an error, reject the promise
 				reject(err);
 			}
 		}, 100);
 	});
 }
 
+/**
+ * This function counts the number of neighbors at the given (i,j) coordinate
+ * and, if there ratio of (homogeneous neighbors/total neighbors) is greater
+ * than the inputed threshold, the coordinate is added to tilesToMove as it
+ * needs to be relocated.
+ *
+ * @param {Array} tilesToMove the list of tiles to relocate in this generation
+ * @param {integer} i the x coordinate
+ * @param {integer} j the y coordinate
+ * @param {integer} dim the length of the board
+ */
 function countNeighbors(tilesToMove, i, j, dim) {
-	//count the number of neighbors and homogeneous neighbors at the given i,j coordinate
-
+	//the threshold of minimum homogeneous neighbors to total neighbors
 	let threshold = document.querySelector("#threshold").value;
+	//the total number of neighbors of the given coordinate
 	let neighbors = 0;
+	//the total number of homogeneous neighbors of the given coordinate
 	let sameColoredNeighbors = 0;
 
+	//count the number of neighbors and homogeneous neighbors at the given i,j coordinate
 	if (i != 0) {
 		//if we are not in the top row, count the neighbors above us
 		let x = boardArray[i - 1][j];
