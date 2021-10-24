@@ -278,7 +278,7 @@ function round(dim) {
 				//relocate each tile in the list of tiles to be moved
 				while (tilesToMove.length > 0) {
 					//select a tile to relocate
-					let moving = tilesToMove.pop();
+					let moving = tilesToMove.shift();
 					let x = moving[0];
 					let y = moving[1];
 					//select a home for the tile to move to
